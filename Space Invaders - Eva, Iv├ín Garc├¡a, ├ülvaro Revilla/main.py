@@ -163,7 +163,7 @@ class Aliens(pygame.sprite.Sprite):
         self.rect.x += self.move_direction_x
         if self.rect.x + self.rect.width > screen_width - self.rect.width or self.rect.x < 0:
                 self.move_direction_x *= -1
-                self.rect.y += 200
+                self.rect.y += 50
 
         
       
