@@ -3,40 +3,35 @@ from pygame import mixer
 from pygame.locals import *
 import random
 
-
-pygame.mixer.pre_init(44100, -16, 2, 512)
+# Configuración general
+pygame.mixer.pre_init(44100, -16, 2, 512)  # (freq 44100 x def., -16 x def., canal 2 x def., tamaño buffer lo reducimos)
+pygame.font.init()  # Inicializa el módulo font para las fuentes
 mixer.init()
-pygame.init()
-
+pygame.init()  # Inicializa los módulos pygame y es requerido para cualquier tipo de juego
 
 # FPS a los que correrá el juego
 clock = pygame.time.Clock()
 fps = 60
 
-
+# Creación de ventana (Tamaño, titulo):
 screen_width = 600
 screen_height = 700
 
-screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("Space Invanders")
+screen = pygame.display.set_mode((screen_width, screen_height))  # display surface
+pygame.display.set_caption("Space Invanders")  # Nombre ventana
 
+# Definimos variables de fuentes
+#                        (Path/Nombre fuente, tamaño)
+font30 = pygame.font.Font("Fuentes/Goldman-Regular.ttf", 30)
+font40 = pygame.font.Font("Fuentes/Goldman-Regular.ttf", 40)
 
-# Define fuentes a utilizar
-font30 = pygame.font.SysFont("Constantia", 30)
-font40 = pygame.font.SysFont("Constantia", 40)
-
-
-# Carga de ficheros de sonido de explosion y de disparo del juego
-
+# Carga de ficheros de sonido de explosión y de disparo del juego
 explosion_fx = pygame.mixer.Sound("img/explosion.wav")
 explosion_fx.set_volume(0.25)
-
 explosion2_fx = pygame.mixer.Sound("img/explosion2.wav")
 explosion2_fx.set_volume(0.25)
-
 laser_fx = pygame.mixer.Sound("img/laser.wav")
 laser_fx.set_volume(0.25)
-
 
 # Definición de columnas y filas del array de aliens
 rows = 5
@@ -45,7 +40,7 @@ alien_cooldown = 1000  # Tiempo de enfriamiento entre disparos de los alienígen
 last_alien_shot = pygame.time.get_ticks()
 countdown = 3
 last_count = pygame.time.get_ticks()
-game_over = 0  # 0 es estado neutro, 1 para cuando el jugador ha ganaod, -1 para cuando el jugador ha perdido
+game_over = 0  # 0 es estado neutro, 1 para cuando el jugador ha ganado, -1 para cuando el jugador ha perdido
 
 # Colores a utilizar
 red = (255, 0, 0)
@@ -68,8 +63,7 @@ def draw_text(text, font, text_col, x, y):
 
 # Creación de la clase de la nave del jugador
 class Spaceship(pygame.sprite.Sprite):
-    
-    
+
     def __init__(self, x, y, health):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load("img/spaceship.png")
@@ -107,7 +101,7 @@ class Spaceship(pygame.sprite.Sprite):
         pygame.draw.rect(
             screen, red, (self.rect.x, (self.rect.bottom + 10), self.rect.width, 15)
         )
-        if self.health_remaining > 0:  
+        if self.health_remaining > 0:
             pygame.draw.rect(
                 screen,
                 green,
@@ -124,8 +118,9 @@ class Spaceship(pygame.sprite.Sprite):
             explosion_group.add(explosion)
             self.kill()
             game_over = -1
-            
+
         return game_over
+
 
 # Creación de la clase que define los disparos
 class Bullets(pygame.sprite.Sprite):
@@ -157,11 +152,9 @@ class Aliens(pygame.sprite.Sprite):
 
     def update(self):
         self.rect.x += self.move_direction_x
-        if self.rect.x+self.rect.width > screen_width-self.rect.width or self.rect.x < 0:
+        if self.rect.x + self.rect.width > screen_width - self.rect.width or self.rect.x < 0:
             self.move_direction_x *= -1
-            self.rect.y+=100
-        
-
+            self.rect.y += 100
 
 
 # Creación de las balas de los aliens
@@ -177,13 +170,13 @@ class Alien_Bullets(pygame.sprite.Sprite):
         if self.rect.top > screen_height:
             self.kill()
         if pygame.sprite.spritecollide(
-            self, spaceship_group, False, pygame.sprite.collide_mask
+                self, spaceship_group, False, pygame.sprite.collide_mask
         ):
             self.kill()
             explosion2_fx.play()
             # reduce spaceship health
             spaceship.health_remaining -= 1
-            spaceship.health_visibility=True
+            spaceship.health_visibility = True
             explosion = Explosion(self.rect.centerx, self.rect.centery, 1)
             explosion_group.add(explosion)
 
@@ -210,7 +203,7 @@ class Explosion(pygame.sprite.Sprite):
 
     def update(self):
         explosion_speed = 3
-        # Actualizar la animacion de la explosión
+        # Actualizar la animación de la explosión
         self.counter += 1
 
         if self.counter >= explosion_speed and self.index < len(self.images) - 1:
@@ -230,6 +223,7 @@ alien_group = pygame.sprite.Group()
 alien_bullet_group = pygame.sprite.Group()
 explosion_group = pygame.sprite.Group()
 
+
 # Función para generar los alienígenas en las filas y columnas definidas
 def create_aliens():
     for row in range(rows):
@@ -240,12 +234,11 @@ def create_aliens():
 
 create_aliens()
 
-
 # Creación del jugador
 spaceship = Spaceship(int(screen_width / 2), screen_height - 100, 3)
 spaceship_group.add(spaceship)
 
-# Bucle principal del juego
+# Bucle principal del juego donde ejecutaremos las funciones:
 run = True
 while run:
 
@@ -254,19 +247,19 @@ while run:
     # Se dibuja el fondo
     draw_bg()
     draw_text(
-                    "SPACE INVADERS",
-                    font40,
-                    white,
-                    int(screen_width / 2 - 155),
-                    int(20),
-                )
+        "SPACE INVADERS",
+        font40,
+        white,
+        int(screen_width / 2 - 185),
+        int(20),
+    )
     if countdown == 0:
         # Se crean aleatoriamente los disparos de los aliens
         time_now = pygame.time.get_ticks()
         if (
-            time_now - last_alien_shot > alien_cooldown
-            and len(alien_bullet_group) < 5
-            and len(alien_group) > 0
+                time_now - last_alien_shot > alien_cooldown
+                and len(alien_bullet_group) < 5
+                and len(alien_group) > 0
         ):
             attacking_alien = random.choice(alien_group.sprites())
             alien_bullet = Alien_Bullets(
@@ -278,7 +271,6 @@ while run:
         # Comprobación de condición de victoria
         if len(alien_group) == 0:
             game_over = 1
-        
 
         if game_over == 0:
             # Actualización del jugador en pantalla
@@ -295,7 +287,7 @@ while run:
                     "HAS PERDIDO!",
                     font40,
                     white,
-                    int(screen_width / 2 - 100),
+                    int(screen_width / 2 - 150),
                     int(screen_height / 2 + 50),
                 )
             if game_over == 1:
@@ -303,18 +295,16 @@ while run:
                     "HAS GANADO!",
                     font40,
                     white,
-                    int(screen_width / 2 - 100),
+                    int(screen_width / 2 - 150),
                     int(screen_height / 2 + 50),
                 )
-                
-            
 
     if countdown > 0:
         draw_text(
             "PREPÁRATE!",
             font40,
             white,
-            int(screen_width / 2 - 110),
+            int(screen_width / 2 - 150),
             int(screen_height / 2 + 50),
         )
         draw_text(
@@ -339,11 +329,9 @@ while run:
     alien_bullet_group.draw(screen)
     explosion_group.draw(screen)
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+    for event in pygame.event.get():  # llamadas a todos los eventos de usuarios
+        if event.type == pygame.QUIT:   # Cerrar el juego una vez termina
             run = False
-
-
 
     pygame.display.update()
 
