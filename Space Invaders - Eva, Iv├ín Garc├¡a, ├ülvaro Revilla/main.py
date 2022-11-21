@@ -117,8 +117,17 @@ class Spaceship(pygame.sprite.Sprite):
             explosion = Explosion(self.rect.centerx, self.rect.centery, 3)
             explosion_group.add(explosion)
             self.kill()
+            game_over=-1
+            
+   
+        if pygame.sprite.spritecollide(
+                self, alien_group, False, pygame.sprite.collide_mask
+        ):
+            explosion = Explosion(self.rect.centerx, self.rect.centery, 3)
+            explosion_group.add(explosion)
+            self.kill()
             game_over = -1
-
+            
         return game_over
 
 
@@ -153,8 +162,11 @@ class Aliens(pygame.sprite.Sprite):
     def update(self):
         self.rect.x += self.move_direction_x
         if self.rect.x + self.rect.width > screen_width - self.rect.width or self.rect.x < 0:
-            self.move_direction_x *= -1
-            self.rect.y += 100
+                self.move_direction_x *= -1
+                self.rect.y += 200
+
+        
+      
 
 
 # Creación de las balas de los aliens
@@ -253,6 +265,18 @@ while run:
         int(screen_width / 2 - 185),
         int(20),
     )
+    
+    # Actualización de las explosiones
+    explosion_group.update()
+
+    # Se dibujan los grupos de sprites en pantalla
+    spaceship_group.draw(screen)
+    bullet_group.draw(screen)
+    alien_group.draw(screen)
+    alien_bullet_group.draw(screen)
+    explosion_group.draw(screen)
+
+    
     if countdown == 0:
         # Se crean aleatoriamente los disparos de los aliens
         time_now = pygame.time.get_ticks()
@@ -290,6 +314,7 @@ while run:
                     int(screen_width / 2 - 150),
                     int(screen_height / 2 + 50),
                 )
+                
             if game_over == 1:
                 draw_text(
                     "HAS GANADO!",
@@ -298,6 +323,7 @@ while run:
                     int(screen_width / 2 - 150),
                     int(screen_height / 2 + 50),
                 )
+            
 
     if countdown > 0:
         draw_text(
@@ -319,15 +345,6 @@ while run:
             countdown -= 1
             last_count = count_timer
 
-    # Actualización de las explosiones
-    explosion_group.update()
-
-    # Se dibujan los grupos de sprites en pantalla
-    spaceship_group.draw(screen)
-    bullet_group.draw(screen)
-    alien_group.draw(screen)
-    alien_bullet_group.draw(screen)
-    explosion_group.draw(screen)
 
     for event in pygame.event.get():  # llamadas a todos los eventos de usuarios
         if event.type == pygame.QUIT:   # Cerrar el juego una vez termina
