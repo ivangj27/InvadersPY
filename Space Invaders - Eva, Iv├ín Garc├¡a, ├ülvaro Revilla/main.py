@@ -57,7 +57,7 @@ def draw_bg():
 
 # Función de creación del texto en pantalla
 def draw_text(text, font, text_col, x, y):
-    img = font.render(text, True, text_col)
+    img = font.render(text, True, text_col,'black')
     screen.blit(img, (x, y))
 
 
