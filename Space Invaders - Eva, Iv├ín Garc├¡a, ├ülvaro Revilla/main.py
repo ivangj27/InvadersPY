@@ -102,6 +102,7 @@ class Nave(pygame.sprite.Sprite):
         pygame.draw.rect(
             pantalla, rojo, (self.rect.x, (self.rect.bottom + 10), self.rect.width, 15)
         )
+        # Actuaización de la barra de vida
         if self.vida_restante > 0:
             pygame.draw.rect(
                 pantalla,
@@ -113,14 +114,14 @@ class Nave(pygame.sprite.Sprite):
                     15,
                 ),
             )
-
+        # Explosion y fin del juego cuando la vida de la nave llega a cero
         elif self.vida_restante <= 0:
             explosion = Explosion(self.rect.centerx, self.rect.centery, 3)
             explosion_grupo.add(explosion)
             self.kill()
             game_over=-1
             
-   
+        # Colisión de los aliens con la nave
         if pygame.sprite.spritecollide(
                 self, grupo_aliens, False, pygame.sprite.collide_mask
         ):
@@ -139,11 +140,12 @@ class Balas(pygame.sprite.Sprite):
         self.image = pygame.image.load("img/bullet.png")
         self.rect = self.image.get_rect()
         self.rect.center = [x, y]
-
+    # Actualización de las balas
     def update(self):
         self.rect.y -= 5
         if self.rect.bottom < 0:
             self.kill()
+        # Cambio del sprite cuando colisiona
         if pygame.sprite.spritecollide(self, grupo_aliens, True):
             self.kill()
             explosion_fx.play()
@@ -160,14 +162,15 @@ class Aliens(pygame.sprite.Sprite):
         self.rect.center = [x, y]
         self.mover_direccion = 1
 
+    #Movimiento de los aliens por la pantalla
     def update(self):
         self.rect.x += self.mover_direccion
         if self.rect.x + self.rect.width > ancho_pantalla - self.rect.width or self.rect.x < 0:
                 self.mover_direccion *= -1
                 self.rect.y += 50
 
-        
-      
+
+
 
 
 # Creación de las balas de los aliens
@@ -187,7 +190,7 @@ class Balas_Aliens(pygame.sprite.Sprite):
         ):
             self.kill()
             explosion2_fx.play()
-            # reduce spaceship health
+            # Reducir vida de la nave
             nave.vida_restante -= 1
             nave.visibilidad_vida = True
             explosion = Explosion(self.rect.centerx, self.rect.centery, 1)
@@ -199,7 +202,7 @@ class Explosion(pygame.sprite.Sprite):
     def __init__(self, x, y, size):
         pygame.sprite.Sprite.__init__(self)
         self.images = []
-        for num in range(1, 6):
+        for num in range(1, 6): # Cambios de la explosión durante la animación
             img = pygame.image.load(f"img/exp{num}.png")
             if size == 1:
                 img = pygame.transform.scale(img, (20, 20))
@@ -215,7 +218,7 @@ class Explosion(pygame.sprite.Sprite):
         self.contador = 0
 
     def update(self):
-        explosion_velocidad = 3
+        explosion_velocidad = 3 # Velocidad de la animación de explosión
         # Actualizar la animación de la explosión
         self.contador += 1
 
@@ -286,7 +289,7 @@ while inicio:
                 and len(aliens_balas_grupo) < 5
                 and len(grupo_aliens) > 0
         ):
-            atacando_alien = random.choice(grupo_aliens.sprites())
+            atacando_alien = random.choice(grupo_aliens.sprites()) # Se elige aleatoriamente el alien que dispara
             alien_bala = Balas_Aliens(
                 atacando_alien.rect.centerx, atacando_alien.rect.bottom
             )
@@ -307,7 +310,7 @@ while inicio:
             aliens_balas_grupo.update()
 
         else:
-            if game_over == -1:
+            if game_over == -1: # Fin del juego en caso de que la vida llegue a 0 o choque con los aliens
                 dibujar_texto(
                     "HAS PERDIDO!",
                     fuente40,
@@ -316,7 +319,7 @@ while inicio:
                     int(largo_pantalla / 2 + 50),
                 )
                 
-            if game_over == 1:
+            if game_over == 1: # Victoria si se eliminan a todos los aliens
                 dibujar_texto(
                     "HAS GANADO!",
                     fuente40,
@@ -326,7 +329,7 @@ while inicio:
                 )
             
 
-    if cuenta_atras > 0:
+    if cuenta_atras > 0: # Cuenta atrás inicio del juego
         dibujar_texto(
             "PREPÁRATE!",
             fuente40,
@@ -347,7 +350,7 @@ while inicio:
             cuenta_final = temporizador
 
 
-    for event in pygame.event.get():  # llamadas a todos los eventos de usuarios
+    for event in pygame.event.get():  # Llamadas a todos los eventos de usuarios
         if event.type == pygame.QUIT:   # Cerrar el juego una vez termina
             inicio = False
 
